@@ -2,7 +2,6 @@ import { rainbow72, intToAlphabet, getRandomAngle } from "./utils/helper"
 import './main.css'
 
 const colors = rainbow72
-console.log("colors", colors)
 
 //const circle:HTMLDivElement = document.querySelector('#circle')!  //? //2者差?，类型断言、类型注解
 const circle = document.querySelector<HTMLDivElement>('#circle')!
@@ -13,6 +12,7 @@ const sliceNumber = document.querySelector<HTMLSpanElement>('#sliceNumber')!
 const startBtn = document.getElementById("startBtn") as HTMLButtonElement
 const clearBtn = document.getElementById("clearBtn") as HTMLButtonElement
 
+let timerId: ReturnType<typeof setTimeout> | null = null; //?
 const animaSec = 5
 let timeDep = 0 //Date.now();
 
@@ -74,18 +74,19 @@ startBtn.addEventListener("click", () => {
 	if (timeNew - timeDep < animaSec * 1000) return
 
 	console.log('@@@')
+	const basicRotateDeg = 3600;
 
-	let x = 1800 + getRandomAngle()
+	let x = basicRotateDeg + getRandomAngle()	//x = total rotate deg
+
 	circle.style.setProperty("--x", `${x}deg`)
-	circle.classList.add("rotate-[var(--x)]")
 	circle.style.transition = `transform ${animaSec}s ease-out`
 	sliceController.style.pointerEvents = "none"
 
-	setTimeout(() => {
+	timerId = setTimeout(() => {
 		console.log("****")
 		
-		x = x-1800
-		if (x > 360) x = x-360
+		x = x - basicRotateDeg
+		x = x % 360
 
 		circle.style.setProperty("--x", `${x}deg`)
 		circle.style.transition = ""
@@ -96,8 +97,12 @@ startBtn.addEventListener("click", () => {
 	timeDep = timeNew
 })
 
-clearBtn.addEventListener("click", () => {
-	//circle.style.setProperty("--x", `0deg`)
-	circle.classList.remove("rotate-[var(--x)]")
-	circle.style.transition = ""
-})
+clearBtn.addEventListener('click', () => {
+	//
+	circle.style.setProperty('--x', `0deg`);
+	circle.style.transition = '';
+	sliceController.style.pointerEvents = '';
+
+	timeDep = timeDep - animaSec * 1000;
+	if (timerId !== null) clearTimeout(timerId);
+});

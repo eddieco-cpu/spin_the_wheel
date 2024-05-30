@@ -9,17 +9,27 @@
   <body>
     <main>
       <section class="h-[50vh] bg-gray-100 flex justify-center items-center">
-        <div
-          id="circle"
-          class="h-4/6 aspect-square rounded-full ring-1 ring-gray-400 relative rotate-[var(--x)]"
-        >
-          <!-- <div
+        <div class="h-4/6 aspect-square relative">
+          <div
+            class="m-auto absolute top-0 left-0 right-0 z-[2] bg-gray-800 w-4 h-8 translate-y-[-60%]"
+            style="clip-path: polygon(100% 0, 50% 100%, 0 0)"
+          >
+            <div
+              class="m-auto absolute top-[1px] left-0 right-0 bg-white w-[calc(100%-2px)] h-[calc(100%-4px)]"
+              style="clip-path: polygon(100% 0, 50% 100%, 0 0)"
+            ></div>
+          </div>
+          <div
+            id="circle"
+            class="h-full aspect-square rounded-full ring-1 ring-gray-400 absolute rotate-[var(--x)]"
+          >
+            <!-- <div
             class="absolute m-auto top-0 left-0 right-0 bottom-0 text-center w-fit h-[130%] rotate-[var(--r)]"
             style="--r: 45deg"
           >
             A
           </div>
-          -->
+          --></div>
         </div>
       </section>
       <section class="h-[50vh] bg-neutral-300 p-5">
@@ -28,7 +38,7 @@
             type="range"
             id="sliceController"
             min="1"
-            max="36"
+            max="30"
             value="6"
             class="w-80 mr-2"
           />
