@@ -37,3 +37,8 @@ export default {
 
 參考文章
 https://weiyun0912.github.io/Wei-Docusaurus/docs/Vite/Vite-Github-Pages/
+
+```
+// 提交前記得都要下 deploy 指令
+npm run deploy
+```
