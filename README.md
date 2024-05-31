@@ -32,3 +32,8 @@ export default {
   plugins: [],
 };
 ```
+
+3. 部屬到 github page
+
+參考文章
+https://weiyun0912.github.io/Wei-Docusaurus/docs/Vite/Vite-Github-Pages/
