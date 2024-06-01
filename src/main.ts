@@ -43,10 +43,16 @@ function setSliceHTML(n: number) {
 	for (let i = 0; i < n; i++) {
 		sliceHTML += `
 			<div
-				class="absolute m-auto top-0 left-0 right-0 bottom-0 text-center w-fit h-[130%] rotate-[var(--r)]"
+				class="absolute m-auto top-0 left-0 right-0 bottom-0 text-center w-fit h-[108%] rotate-[var(--r)]"
 				style="--r: ${Math.round((i * 360) / n + 180 / n)}deg"
 			>
-				${intToAlphabet(i + 1)}
+				<p class="m-auto block rotate-[270deg] w-[1px] relative">
+					<b
+						class="block h-[3vh] absolute m-auto top-0 bottom-0 left-0 font-normal max-w-16 truncate text-[2vh] cursor-pointer hover:text-neutral-500 active:text-neutral-100"
+						title="${intToAlphabet(i + 1)}"
+						>${intToAlphabet(i + 1)}</b
+					>
+				</p>
 			</div>
 		`
 	}

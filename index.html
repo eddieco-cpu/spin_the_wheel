@@ -8,9 +8,9 @@
   </head>
   <body>
     <main>
-      <section class="h-[50vh] bg-gray-100 flex justify-center items-center">
-        <div class="h-4/6 aspect-square relative">
-          <div
+      <section class="h-[63vh] bg-gray-100 flex justify-center items-center">
+        <div class="h-4/6 max-h-56 aspect-square relative">
+          <section
             class="m-auto absolute top-0 left-0 right-0 z-[2] bg-gray-800 w-4 h-8 translate-y-[-60%]"
             style="clip-path: polygon(100% 0, 50% 100%, 0 0)"
           >
@@ -18,21 +18,27 @@
               class="m-auto absolute top-[1px] left-0 right-0 bg-white w-[calc(100%-2px)] h-[calc(100%-4px)]"
               style="clip-path: polygon(100% 0, 50% 100%, 0 0)"
             ></div>
-          </div>
-          <div
+          </section>
+          <section
             id="circle"
             class="h-full aspect-square rounded-full ring-1 ring-gray-400 absolute rotate-[var(--x)]"
           >
             <!-- <div
-            class="absolute m-auto top-0 left-0 right-0 bottom-0 text-center w-fit h-[130%] rotate-[var(--r)]"
-            style="--r: 45deg"
-          >
-            A
-          </div>
-          --></div>
+              class="absolute m-auto top-0 left-0 right-0 bottom-0 text-center w-fit h-[105%] rotate-[var(--r)]"
+              style="--r: 90deg"
+            >
+              <p class="m-auto block rotate-[270deg] w-[1px] relative">
+                <b
+                  class="block h-[3vh] absolute m-auto top-0 bottom-0 left-0 font-normal max-w-16 truncate text-[2vh]"
+                  title="ABCDEFG"
+                  >測試文字測試</b
+                >
+              </p>
+            </div> -->
+          </section>
         </div>
       </section>
-      <section class="h-[50vh] bg-neutral-300 p-5">
+      <section class="min-h-[37vh] bg-neutral-300 p-5">
         <p class="py-2">
           <input
             type="range"
