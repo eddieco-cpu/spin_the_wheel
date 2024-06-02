@@ -23,7 +23,7 @@ const addBtn = document.getElementById("addBtn") as HTMLButtonElement
 let timerId: ReturnType<typeof setTimeout> | null = null; //?
 
 const minSlice = 2
-const maxSlice = 20
+const maxSlice = 30
 const animaSec = 5
 let timeDep = 0 //Date.now();
 
@@ -42,15 +42,16 @@ function createSlices() {
 	console.log("slices", slices)
 }
 
+//Math.round(num * 10) / 10;
 function setCricleBg(n: number) {
 	var colorJump = Math.floor(colors.length / n);
 
 	var bgString = "conic-gradient(";
 
 	for (let i = 0; i < n; i++) {
-		bgString += ` ${colors[colorJump * i]} ${ //?
-			Math.round(360 / n) * i
-		}deg ${(Math.round(360 / n) * (i + 1))-1}deg`;
+		bgString += ` ${colors[colorJump * i]} ${
+			Math.round((360 / n) * i * 10) / 10
+		}deg ${Math.round((360 / n) * (i + 1) * 10) / 10 }deg`;
 
 		if (i < n - 1) {
 			bgString += `,`;
@@ -79,6 +80,10 @@ function setSliceHTML(n: number) {
 					>
 				</p>
 			</div>
+			<p 
+				class="slice_line w-[1px] h-full m-auto absolute top-0 left-0 right-0 bottom-0 rotate-[var(--r)]"
+				style="--r: ${Math.round((i * 360) / n )}deg"
+			></p>
 		`
 	}
 

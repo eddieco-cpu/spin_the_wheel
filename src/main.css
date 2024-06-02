@@ -59,6 +59,10 @@
 }
 
 /* --- */
+.slice_line {
+  background-image: linear-gradient(to bottom, #fff 50%, transparent 50%);
+}
+
 .slice_inputer:focus + .slice_remover::before {
   content: "";
   @apply block w-[6px] aspect-square absolute top-[-5px] right-[-3px] bg-red-400 rounded-full;
