@@ -1,4 +1,5 @@
 import { rainbow72, intToAlphabet, getRandomAngle } from "./utils/helper"
+import { Slice, Slices } from "./utils/type"
 import './main.css'
 
 const colors = rainbow72
@@ -7,16 +8,40 @@ const colors = rainbow72
 const circle = document.querySelector<HTMLDivElement>('#circle')!
 
 const sliceController = document.querySelector<HTMLInputElement>('#sliceController')!
-const sliceNumber = document.querySelector<HTMLSpanElement>('#sliceNumber')!
+const sliceNumbers = document.querySelectorAll<HTMLSpanElement>('.slice-number')!
+
+const drawer = document.querySelector<HTMLDivElement>('.drawer')!
+const drawerCloser = document.querySelector<HTMLButtonElement>(".drawer_closer")!
+const drawerContainer = document.querySelector<HTMLDivElement>('.drawer_container')!
+const drawerSliceGroup = document.querySelector<HTMLUListElement>('.drawer_slice-group')!
 
 const startBtn = document.getElementById("startBtn") as HTMLButtonElement
 const clearBtn = document.getElementById("clearBtn") as HTMLButtonElement
+const editBtn = document.getElementById("editBtn") as HTMLButtonElement
+const addBtn = document.getElementById("addBtn") as HTMLButtonElement
 
 let timerId: ReturnType<typeof setTimeout> | null = null; //?
+
+const minSlice = 2
+const maxSlice = 20
 const animaSec = 5
 let timeDep = 0 //Date.now();
 
+let slices: Slices =  []
+
 //
+//
+function createSlices() {
+	for (let i = 0; i < maxSlice; i++) {
+		const slice: Slice = {
+			id: intToAlphabet(i + 1),
+			text: `opt ${intToAlphabet(i + 1)}`,
+		}
+		slices.push(slice)
+	}
+	console.log("slices", slices)
+}
+
 function setCricleBg(n: number) {
 	var colorJump = Math.floor(colors.length / n);
 
@@ -36,7 +61,6 @@ function setCricleBg(n: number) {
 	circle.style.background = bgString;
 }
 
-
 function setSliceHTML(n: number) {
 	var sliceHTML = "";
 
@@ -48,9 +72,10 @@ function setSliceHTML(n: number) {
 			>
 				<p class="m-auto block rotate-[270deg] w-[1px] relative">
 					<b
-						class="block h-[3vh] absolute m-auto top-0 bottom-0 left-0 font-normal max-w-16 truncate text-[2vh] cursor-pointer hover:text-neutral-500 active:text-neutral-100"
-						title="${intToAlphabet(i + 1)}"
-						>${intToAlphabet(i + 1)}</b
+						class="slice_text block h-[3vh] absolute m-auto top-0 bottom-0 left-0 font-normal max-w-16 truncate text-[2vh] cursor-pointer hover:text-neutral-500 active:text-neutral-100"
+						title="${slices[i].text}"
+						data-id="${slices[i].id}"
+						>${slices[i].text}</b
 					>
 				</p>
 			</div>
@@ -60,9 +85,41 @@ function setSliceHTML(n: number) {
 	circle.innerHTML = sliceHTML
 }
 
+function setSliceInputs(n: number) {
+	var sliceInputsHTML = "";
+
+	for (let i = 0; i < n; i++) {
+		sliceInputsHTML += `
+			<li	
+				class="flex flex-row-reverse justify-end items-center gap-2 pl-2 py-3"
+			>
+				<input
+					type="text"
+					data-id="${slices[i].id}" 
+					value="${slices[i].text}"
+					class="slice_inputer outline-0 w-[calc(100%-72px)] min-w-60 px-2 py-1 rounded-sm relative focus:ring-[2px] focus:ring-gray-300"
+				/>
+				<button
+					class="slice_remover text-base text-gray-400 rounded-full w-6 h-6 custom-shadow relative"
+				>
+					✕
+				</button>
+			</li>
+		`
+	}
+
+	drawerSliceGroup.innerHTML = sliceInputsHTML
+}
+
+//
 //
 document.addEventListener("DOMContentLoaded", () => {
-	sliceNumber.textContent = sliceController.value
+	createSlices()
+
+	sliceController.max = maxSlice.toString();
+	sliceController.min = minSlice.toString();
+	
+	sliceNumbers.forEach(item => item.textContent = sliceController.value)
 	setCricleBg(Number(sliceController.value))
 	setSliceHTML(Number(sliceController.value))
 })
@@ -70,11 +127,103 @@ document.addEventListener("DOMContentLoaded", () => {
 sliceController.addEventListener("input", function(e: Event) {  //?
 	const target = e.target as HTMLInputElement;    //?
 
-	sliceNumber.textContent = target.value;
+	sliceNumbers.forEach(item => item.textContent = target.value)
 	setCricleBg(Number(target.value))
 	setSliceHTML(Number(target.value))
 })
 
+addBtn.addEventListener("click", () => {
+	sliceController.value = `${Number(sliceController.value) +1}`
+
+	sliceNumbers.forEach(item => item.textContent = sliceController.value)
+	setCricleBg(Number(sliceController.value))
+	setSliceHTML(Number(sliceController.value))
+	setSliceInputs(Number(sliceController.value))
+})
+
+//
+//
+editBtn.addEventListener('click', () => {
+	//
+	const expectSliceNum = Number(sliceController.value)
+	const drawerSliceNum = drawerSliceGroup.querySelectorAll("li").length
+
+	if (expectSliceNum !== drawerSliceNum) {
+		setSliceInputs(expectSliceNum)
+	}
+	drawer.classList.add("drawer-active")
+})
+
+circle.addEventListener("click", (e) => {
+	//
+	const target = e.target as HTMLElement | null;	//?	//類型斷言的使用時機?	//怎麼知道是 as HTMLElement
+	if (!target || !target.classList.contains("slice_text")) return
+
+	const expectSliceNum = Number(sliceController.value)
+	const drawerSliceNum = drawerSliceGroup.querySelectorAll("li").length
+
+	if (expectSliceNum !== drawerSliceNum) {
+		setSliceInputs(expectSliceNum)
+	}
+	drawer.classList.add("drawer-active")
+
+	const dataId = target.getAttribute("data-id")
+	const sliceInputs = [...document.querySelectorAll(".slice_inputer")]
+	const sliceInput = sliceInputs.find(el => el.getAttribute("data-id") === dataId) as HTMLInputElement | undefined	//?
+	sliceInput?.click()
+	sliceInput?.focus()
+})
+
+//
+//
+drawer.addEventListener("click", () => {
+	drawer.classList.remove("drawer-active")
+})
+drawerCloser.addEventListener("click", () => {
+	drawer.classList.remove("drawer-active")
+})
+
+//
+//
+drawerContainer.addEventListener("click", (e) => {	//? 不用定義 e? 是否讓他自動推導?
+	e.stopPropagation()	//?
+
+	const target = e.target as HTMLElement | null
+
+	if (target && target.classList.contains("slice_inputer")) {
+		//
+		let inputTarget = target as HTMLInputElement
+
+		inputTarget.oninput =  () => {
+			//
+			const targetId = inputTarget.getAttribute("data-id")
+			slices = slices.map(el => el.id === targetId ? {...el, text: inputTarget.value} : el)
+			setSliceHTML(Number(sliceController.value))
+		}
+	}
+
+	if (target && target.classList.contains("slice_remover")) {
+		//
+		if (Number(sliceController.value) <= minSlice) return alert(`options no less than ${minSlice}`)
+		
+		//
+		const targetId = target.closest("li")?.querySelector(".slice_inputer")?.getAttribute("data-id")
+		slices = [...slices.filter(el => el.id !== targetId), slices.find(el => el.id === targetId)!]	//?
+
+		//
+		target.closest("li")?.remove()
+
+		//
+		sliceController.value = `${Number(sliceController.value) - 1}`
+
+		sliceNumbers.forEach(item => item.textContent = sliceController.value)
+		setCricleBg(Number(sliceController.value))
+		setSliceHTML(Number(sliceController.value))
+	}
+})
+
+//
+//
 startBtn.addEventListener("click", () => {
 	let timeNew = Date.now();
 	if (timeNew - timeDep < animaSec * 1000) return

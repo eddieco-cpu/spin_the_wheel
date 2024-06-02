@@ -18,7 +18,8 @@ const rainbowColors: Color[] = [
     [0, 255, 0],    // 綠
     [0, 0, 255],    // 藍
     [75, 0, 130],   // 靛
-    [148, 0, 211]   // 紫
+    [148, 0, 211],   // 紫
+    [165, 42, 42],  //棕
 ];
 
 function rgbToHex(rgb: Color): string {
@@ -66,9 +67,9 @@ export function intToAlphabet(num: number): string {
     num = Math.floor((num - 1) / 26);
   }
 
-  return "opt " + result;
+  return result;
 }
 
 export function getRandomAngle(): number {
-  return Math.floor(Math.random() * 361); // Math.random() 返回 0 到 1 之间的随机数
+  return Math.floor(Math.random() * 361); 
 }
