@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	setSliceHTML(Number(sliceController.value))
 })
 
-sliceController.addEventListener("input", function(e: Event) {  //?
+sliceController.addEventListener("input", function(e) {  //fn 拉出去共用時，需要定義 e: Event
 	const target = e.target as HTMLInputElement;    //?
 
 	sliceNumbers.forEach(item => item.textContent = target.value)
@@ -173,10 +173,12 @@ circle.addEventListener("click", (e) => {
 	drawer.classList.add("drawer-active")
 
 	const dataId = target.getAttribute("data-id")
-	const sliceInputs = [...document.querySelectorAll(".slice_inputer")]
-	const sliceInput = sliceInputs.find(el => el.getAttribute("data-id") === dataId) as HTMLInputElement | undefined	//?
-	sliceInput?.click()
-	sliceInput?.focus()
+	const sliceInputs = [...document.querySelectorAll<HTMLInputElement>(".slice_inputer")]
+	const sliceInput = sliceInputs.find(el => el.getAttribute("data-id") === dataId) //as HTMLInputElement | undefined	//?
+	if (sliceInput) {
+		sliceInput.click()
+		sliceInput.focus()
+	}
 })
 
 //
