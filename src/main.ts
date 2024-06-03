@@ -22,9 +22,11 @@ const addBtn = document.getElementById("addBtn") as HTMLButtonElement
 
 let timerId: ReturnType<typeof setTimeout> | null = null; //?
 
+let FetchedAngle = 0
+
 const minSlice = 2
 const maxSlice = 30
-const animaSec = 5
+const animaSec = 3.9
 let timeDep = 0 //Date.now();
 
 let slices: Slices =  []
@@ -68,12 +70,12 @@ function setSliceHTML(n: number) {
 	for (let i = 0; i < n; i++) {
 		sliceHTML += `
 			<div
-				class="absolute m-auto top-0 left-0 right-0 bottom-0 text-center w-fit h-[108%] rotate-[var(--r)]"
+				class="absolute m-auto top-0 left-0 right-0 bottom-0 text-center w-fit h-[104%] rotate-[var(--r)]"
 				style="--r: ${Math.round((i * 360) / n + 180 / n)}deg"
 			>
 				<p class="m-auto block rotate-[270deg] w-[1px] relative">
 					<b
-						class="slice_text block h-[3vh] absolute m-auto top-0 bottom-0 left-0 font-normal max-w-16 truncate text-[2vh] cursor-pointer hover:text-neutral-500 active:text-neutral-100"
+						class="slice_text block h-[3vh] absolute m-auto top-0 bottom-0 left-0 font-normal max-w-20 max-md:max-w-[70px] truncate text-[2vh] cursor-pointer hover:text-neutral-500 active:text-neutral-100"
 						title="${slices[i].text}"
 						data-id="${slices[i].id}"
 						>${slices[i].text}</b
@@ -236,6 +238,7 @@ startBtn.addEventListener("click", () => {
 	if (timeNew - timeDep < animaSec * 1000) return
 
 	console.log('@@@')
+	document.querySelector<HTMLDivElement>(".message")!.classList.remove("message-active")
 	const basicRotateDeg = 3600;
 
 	let x = basicRotateDeg + getRandomAngle()	//x = total rotate deg
@@ -250,9 +253,19 @@ startBtn.addEventListener("click", () => {
 		x = x - basicRotateDeg
 		x = x % 360
 
+		FetchedAngle = 360 - x
+		const PointToPercentOfWhichSlice = FetchedAngle / (360 / Number(sliceController.value))	//i.e. point to the 3.083 slice
+		const sliceIndex = Math.floor(PointToPercentOfWhichSlice)	//i.e. 3.083 is part of the 3rd slice
+		const slice = slices[sliceIndex]
+
+		console.log(PointToPercentOfWhichSlice)
+		console.log(slice)
+
 		circle.style.setProperty("--x", `${x}deg`)
 		circle.style.transition = ""
 		sliceController.style.pointerEvents = ""
+
+		document.querySelector<HTMLDivElement>(".message")!.classList.add("message-active")
 
 	}, animaSec * 1000)
 
@@ -265,6 +278,14 @@ clearBtn.addEventListener('click', () => {
 	circle.style.transition = '';
 	sliceController.style.pointerEvents = '';
 
+	FetchedAngle = 0
+
 	timeDep = timeDep - animaSec * 1000;
 	if (timerId !== null) clearTimeout(timerId);
 });
+
+//
+//
+document.querySelector<HTMLButtonElement>(".message_canceller")!.addEventListener("click", () => {
+	document.querySelector<HTMLDivElement>(".message")!.classList.remove("message-active")
+})
