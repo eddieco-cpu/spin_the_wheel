@@ -266,6 +266,20 @@ startBtn.addEventListener("click", () => {
 		sliceController.style.pointerEvents = ""
 
 		document.querySelector<HTMLDivElement>(".message")!.classList.add("message-active")
+		document.querySelector<HTMLElement>(".message_opts-amount")!.textContent = sliceController.value
+		document.querySelector<HTMLElement>(".message_selected")!.textContent = slice.text	
+		//notes
+		/** string better than String
+		 * export type Slice = {
+				id: string,		//better then String
+				text: string
+			}
+		 */
+		//if text: String, then
+		/**
+		 * Type 'String' is not assignable to type 'string'.
+         * 'string' is a primitive, but 'String' is a wrapper object. Prefer using 'string' when possible.ts(2322)
+		 */
 
 	}, animaSec * 1000)
 
