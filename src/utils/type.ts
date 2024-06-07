@@ -7,3 +7,10 @@ export type Slice = {
 }
 
 export type Slices = Slice[]
+
+export type Record = {
+    time: string,
+    sliceAmount: number,
+    sliceSelectedId: string,
+    sliceSelectedText: string
+}

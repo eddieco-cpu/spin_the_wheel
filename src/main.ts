@@ -1,5 +1,5 @@
 import { rainbow72, intToAlphabet, getRandomAngle } from "./utils/helper"
-import { Slice, Slices } from "./utils/type"
+import { Slice, Slices, Record } from "./utils/type"
 import './main.css'
 
 const colors = rainbow72
@@ -13,11 +13,12 @@ const sliceNumbers = document.querySelectorAll<HTMLSpanElement>('.slice-number')
 const drawer = document.querySelector<HTMLDivElement>('.drawer')!
 const drawerCloser = document.querySelector<HTMLButtonElement>(".drawer_closer")!
 const drawerContainer = document.querySelector<HTMLDivElement>('.drawer_container')!
-const drawerSliceGroup = document.querySelector<HTMLUListElement>('.drawer_slice-group')!
+const drawerContextGroup = document.querySelector<HTMLUListElement>('.drawer_context-group')!
 
 const startBtn = document.getElementById("startBtn") as HTMLButtonElement
 const clearBtn = document.getElementById("clearBtn") as HTMLButtonElement
 const editBtn = document.getElementById("editBtn") as HTMLButtonElement
+const checkBtn = document.getElementById("checkBtn") as HTMLButtonElement
 const addBtn = document.getElementById("addBtn") as HTMLButtonElement
 
 let timerId: ReturnType<typeof setTimeout> | null = null; //?
@@ -30,6 +31,7 @@ const animaSec = 3.9
 let timeDep = 0 //Date.now();
 
 let slices: Slices =  []
+let records: Record[] = []
 
 //
 //
@@ -115,7 +117,7 @@ function setSliceInputs(n: number) {
 		`
 	}
 
-	drawerSliceGroup.innerHTML = sliceInputsHTML
+	drawerContextGroup.innerHTML = sliceInputsHTML
 }
 
 //
@@ -150,12 +152,32 @@ addBtn.addEventListener("click", () => {
 
 //
 //
+checkBtn.addEventListener('click', () => {
+	//
+	const recordsHTML = records.map((record, index) => {
+		return `
+			<li class="flex items-center gap-2 px-2 py-1">
+				<span class="text-xs text-gray-400">${index + 1}</span>
+				<span class="text-xs text-gray-400">${record.time}</span>
+				<span class="text-xs text-gray-400">${record.sliceAmount}</span>
+				<span class="text-xs text-gray-400">${record.sliceSelectedText}</span>
+			</li>
+		`
+	}
+	).join("")
+
+	drawerContextGroup.innerHTML = recordsHTML
+	
+	drawer.classList.add("drawer-active")
+})
+
 editBtn.addEventListener('click', () => {
 	//
 	const expectSliceNum = Number(sliceController.value)
-	const drawerSliceNum = drawerSliceGroup.querySelectorAll("li").length
+	const drawerSliceNum = drawerContextGroup.querySelectorAll("li").length
+	const isDrawerContextIsSlice: boolean = Boolean(drawerContextGroup.querySelector("slice_inputer"))
 
-	if (expectSliceNum !== drawerSliceNum) {
+	if ((expectSliceNum !== drawerSliceNum) || !isDrawerContextIsSlice) {
 		setSliceInputs(expectSliceNum)
 	}
 	drawer.classList.add("drawer-active")
@@ -163,13 +185,14 @@ editBtn.addEventListener('click', () => {
 
 circle.addEventListener("click", (e) => {
 	//
-	const target = e.target as HTMLElement | null;	//?	//類型斷言的使用時機?	//怎麼知道是 as HTMLElement
+	const target = e.target as HTMLElement | null;	
 	if (!target || !target.classList.contains("slice_text")) return
 
 	const expectSliceNum = Number(sliceController.value)
-	const drawerSliceNum = drawerSliceGroup.querySelectorAll("li").length
+	const drawerSliceNum = drawerContextGroup.querySelectorAll("li").length
+	const isDrawerContextIsSlice: boolean = Boolean(drawerContextGroup.querySelector("slice_inputer"))
 
-	if (expectSliceNum !== drawerSliceNum) {
+	if ((expectSliceNum !== drawerSliceNum) || !isDrawerContextIsSlice) {
 		setSliceInputs(expectSliceNum)
 	}
 	drawer.classList.add("drawer-active")
@@ -199,18 +222,6 @@ drawerContainer.addEventListener("click", (e) => {	//? 不用定義 e? 是否讓
 
 	const target = e.target as HTMLElement | null
 
-	if (target && target.classList.contains("slice_inputer")) {
-		//
-		let inputTarget = target as HTMLInputElement
-
-		inputTarget.oninput =  () => {
-			//
-			const targetId = inputTarget.getAttribute("data-id")
-			slices = slices.map(el => el.id === targetId ? {...el, text: inputTarget.value} : el)
-			setSliceHTML(Number(sliceController.value))
-		}
-	}
-
 	if (target && target.classList.contains("slice_remover")) {
 		//
 		if (Number(sliceController.value) <= minSlice) return alert(`options no less than ${minSlice}`)
@@ -227,6 +238,21 @@ drawerContainer.addEventListener("click", (e) => {	//? 不用定義 e? 是否讓
 
 		sliceNumbers.forEach(item => item.textContent = sliceController.value)
 		setCricleBg(Number(sliceController.value))
+		setSliceHTML(Number(sliceController.value))
+	}
+})
+
+//重要
+drawerContainer.addEventListener("input", (e) => {	//drawerContainer 為 div ，而 div 也可以綁定 input 事件
+	e.stopPropagation()	//?
+
+	const target = e.target as HTMLElement | null
+
+	if (target && target.classList.contains("slice_inputer") && target instanceof HTMLInputElement) {	//類型保護!! 重要!!
+		//
+		console.log("on input")
+		const targetId = target.getAttribute("data-id")
+		slices = slices.map(el => el.id === targetId ? {...el, text: target.value} : el)
 		setSliceHTML(Number(sliceController.value))
 	}
 })
@@ -280,6 +306,13 @@ startBtn.addEventListener("click", () => {
 		 * Type 'String' is not assignable to type 'string'.
          * 'string' is a primitive, but 'String' is a wrapper object. Prefer using 'string' when possible.ts(2322)
 		 */
+
+		records.push({
+			time: new Date().toLocaleTimeString(),
+			sliceAmount: Number(sliceController.value),
+			sliceSelectedId: slice.id,
+			sliceSelectedText: slice.text
+		})
 
 	}, animaSec * 1000)
 
