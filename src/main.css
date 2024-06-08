@@ -40,21 +40,21 @@
   transform: translateX(0%);
 }
 
-.drawer_slice-group::-webkit-scrollbar {
+.drawer_context-group::-webkit-scrollbar {
   width: 6px; /* 寬度 */
   height: 6px; /* 高度 */
 }
-.drawer_slice-group::-webkit-scrollbar-track {
+.drawer_context-group::-webkit-scrollbar-track {
   background: #f1f1f1; /* 軌道背景顏色 */
   border-radius: 10px; /* 圓角 */
 }
-.drawer_slice-group::-webkit-scrollbar-thumb {
+.drawer_context-group::-webkit-scrollbar-thumb {
   background: #bbb; /* 手柄背景顏色 */
   border-radius: 10px; /* 圓角 */
   border: 1px solid #f1f1f1; /* 外邊框以匹配軌道背景 */
 }
 /* 手柄在懸停狀態下的顏色變化 */
-.drawer_slice-group::-webkit-scrollbar-thumb:hover {
+.drawer_context-group::-webkit-scrollbar-thumb:hover {
   background: #888; /* 懸停時的手柄顏色 */
 }
 
@@ -78,4 +78,12 @@
   transform: translateX(0vw);
   opacity: 1;
   transition: transform 0.5s, opacity 0.5s 0.3s;
+}
+
+/* --- */
+#actionBtn[data-action="delete-record"] {
+  @apply text-lg;
+}
+#actionBtn[data-action="delete-record"] + .slice-number {
+  opacity: 0;
 }

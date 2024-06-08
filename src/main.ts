@@ -1,10 +1,10 @@
-import { rainbow72, intToAlphabet, getRandomAngle } from "./utils/helper"
+import { rainbow72, intToAlphabet, getRandomAngle, padNumber } from "./utils/helper"
 import { Slice, Slices, Record } from "./utils/type"
 import './main.css'
 
 const colors = rainbow72
 
-//const circle:HTMLDivElement = document.querySelector('#circle')!  //? //2者差?，类型断言、类型注解
+//const circle:HTMLDivElement = document.querySelector('#circle')!  //? //2者差，类型断言、类型注解
 const circle = document.querySelector<HTMLDivElement>('#circle')!
 
 const sliceController = document.querySelector<HTMLInputElement>('#sliceController')!
@@ -19,9 +19,15 @@ const startBtn = document.getElementById("startBtn") as HTMLButtonElement
 const clearBtn = document.getElementById("clearBtn") as HTMLButtonElement
 const editBtn = document.getElementById("editBtn") as HTMLButtonElement
 const checkBtn = document.getElementById("checkBtn") as HTMLButtonElement
-const addBtn = document.getElementById("addBtn") as HTMLButtonElement
+const actionBtn = document.getElementById("actionBtn") as HTMLButtonElement
 
-let timerId: ReturnType<typeof setTimeout> | null = null; //?
+const message = document.querySelector<HTMLDivElement>(".message")!
+const messageCanceller = document.querySelector<HTMLButtonElement>(".message_canceller")!
+
+
+const noRecordHTML = "<li class='p-2 py-4 bg-white mx-4 mb-2 rounded text-center text-gray-400'>No records</li>"
+
+let timerId: ReturnType<typeof setTimeout> | null = null; //重要!!
 
 let FetchedAngle = 0
 
@@ -30,7 +36,7 @@ const maxSlice = 30
 const animaSec = 3.9
 let timeDep = 0 //Date.now();
 
-let slices: Slices =  []
+let slices: Slices = []
 let records: Record[] = []
 
 //
@@ -53,9 +59,8 @@ function setCricleBg(n: number) {
 	var bgString = "conic-gradient(";
 
 	for (let i = 0; i < n; i++) {
-		bgString += ` ${colors[colorJump * i]} ${
-			Math.round((360 / n) * i * 10) / 10
-		}deg ${Math.round((360 / n) * (i + 1) * 10) / 10 }deg`;
+		bgString += ` ${colors[colorJump * i]} ${Math.round((360 / n) * i * 10) / 10
+			}deg ${Math.round((360 / n) * (i + 1) * 10) / 10}deg`;
 
 		if (i < n - 1) {
 			bgString += `,`;
@@ -86,7 +91,7 @@ function setSliceHTML(n: number) {
 			</div>
 			<p 
 				class="slice_line w-[1px] h-full m-auto absolute top-0 left-0 right-0 bottom-0 rotate-[var(--r)]"
-				style="--r: ${Math.round((i * 360) / n )}deg"
+				style="--r: ${Math.round((i * 360) / n)}deg"
 			></p>
 		`
 	}
@@ -127,52 +132,81 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	sliceController.max = maxSlice.toString();
 	sliceController.min = minSlice.toString();
-	
+
 	sliceNumbers.forEach(item => item.textContent = sliceController.value)
 	setCricleBg(Number(sliceController.value))
 	setSliceHTML(Number(sliceController.value))
 })
 
-sliceController.addEventListener("input", function(e) {  //fn 拉出去共用時，需要定義 e: Event
-	const target = e.target as HTMLInputElement;    //?
+sliceController.addEventListener("input", function (e) {  //fn 拉出去共用時，需要定義 e: Event
+	const target = e.target as HTMLInputElement;
 
 	sliceNumbers.forEach(item => item.textContent = target.value)
 	setCricleBg(Number(target.value))
 	setSliceHTML(Number(target.value))
 })
 
-addBtn.addEventListener("click", () => {
-	sliceController.value = `${Number(sliceController.value) +1}`
+actionBtn.addEventListener("click", () => {
 
-	sliceNumbers.forEach(item => item.textContent = sliceController.value)
-	setCricleBg(Number(sliceController.value))
-	setSliceHTML(Number(sliceController.value))
-	setSliceInputs(Number(sliceController.value))
+	const action = actionBtn.getAttribute("data-action")
+
+	if (action === "add-slice") {
+		sliceController.value = `${Number(sliceController.value) + 1}`
+
+		sliceNumbers.forEach(item => item.textContent = sliceController.value)
+		setCricleBg(Number(sliceController.value))
+		setSliceHTML(Number(sliceController.value))
+		setSliceInputs(Number(sliceController.value))
+	}
+	if (action === "delete-record" && records.length) {
+		records = []
+		drawerContextGroup.innerHTML = noRecordHTML
+		message.classList.remove("message-active")
+	}
+
 })
 
 //
 //
 checkBtn.addEventListener('click', () => {
 	//
-	const recordsHTML = records.map((record, index) => {
-		return `
-			<li class="flex items-center gap-2 px-2 py-1">
-				<span class="text-xs text-gray-400">${index + 1}</span>
-				<span class="text-xs text-gray-400">${record.time}</span>
-				<span class="text-xs text-gray-400">${record.sliceAmount}</span>
-				<span class="text-xs text-gray-400">${record.sliceSelectedText}</span>
+	actionBtn.textContent = "刪"
+	actionBtn.setAttribute("data-action", "delete-record")
+
+	const recordsHTML = records.length ? records.map((record, index) => (
+		`
+			<li class="flex justify-start items-start gap-[2px] p-2 bg-white mx-4 mb-2 rounded">
+				<span class=" text-base text-gray-400 w-8 flex-shrink-0">${padNumber(index + 1)}</span>
+				<div class=" flex-grow">
+					<p
+						class="text-right text-sm leading-none border-b-[1px] border-gray-200 py-1 pr-1 text-gray-400"
+					>
+					${record.time}
+					</p>
+					<p class="px-1 pt-1 line-clamp-1 text-gray-600">
+						<b class="message_selected text-emerald-500 break-all text-xl">${record.sliceSelectedText}</b>
+						was selected
+					</p>
+					<p class="px-1 text-gray-600">
+						from
+						<b class="message_opts-amount text-emerald-500 text-xl">${record.sliceAmount}</b>
+						options
+					</p>
+				</div>
 			</li>
 		`
-	}
-	).join("")
+	)).join("") : noRecordHTML
 
 	drawerContextGroup.innerHTML = recordsHTML
-	
+
 	drawer.classList.add("drawer-active")
 })
 
 editBtn.addEventListener('click', () => {
 	//
+	actionBtn.textContent = "+"
+	actionBtn.setAttribute("data-action", "add-slice")
+
 	const expectSliceNum = Number(sliceController.value)
 	const drawerSliceNum = drawerContextGroup.querySelectorAll("li").length
 	const isDrawerContextIsSlice: boolean = Boolean(drawerContextGroup.querySelector("slice_inputer"))
@@ -185,8 +219,11 @@ editBtn.addEventListener('click', () => {
 
 circle.addEventListener("click", (e) => {
 	//
-	const target = e.target as HTMLElement | null;	
+	const target = e.target as HTMLElement | null;
 	if (!target || !target.classList.contains("slice_text")) return
+
+	actionBtn.textContent = "+"
+	actionBtn.setAttribute("data-action", "add-slice")
 
 	const expectSliceNum = Number(sliceController.value)
 	const drawerSliceNum = drawerContextGroup.querySelectorAll("li").length
@@ -199,7 +236,7 @@ circle.addEventListener("click", (e) => {
 
 	const dataId = target.getAttribute("data-id")
 	const sliceInputs = [...document.querySelectorAll<HTMLInputElement>(".slice_inputer")]
-	const sliceInput = sliceInputs.find(el => el.getAttribute("data-id") === dataId) //as HTMLInputElement | undefined	//?
+	const sliceInput = sliceInputs.find(el => el.getAttribute("data-id") === dataId) //as HTMLInputElement | undefined	
 	if (sliceInput) {
 		sliceInput.click()
 		sliceInput.focus()
@@ -217,15 +254,15 @@ drawerCloser.addEventListener("click", () => {
 
 //
 //
-drawerContainer.addEventListener("click", (e) => {	//? 不用定義 e? 是否讓他自動推導?
-	e.stopPropagation()	//?
+drawerContainer.addEventListener("click", (e) => {	//不用定義 e 是否讓他自動推導
+	e.stopPropagation()	//
 
 	const target = e.target as HTMLElement | null
 
 	if (target && target.classList.contains("slice_remover")) {
 		//
 		if (Number(sliceController.value) <= minSlice) return alert(`options no less than ${minSlice}`)
-		
+
 		//
 		const targetId = target.closest("li")?.querySelector(".slice_inputer")?.getAttribute("data-id")
 		slices = [...slices.filter(el => el.id !== targetId), slices.find(el => el.id === targetId)!]	//?
@@ -244,7 +281,7 @@ drawerContainer.addEventListener("click", (e) => {	//? 不用定義 e? 是否讓
 
 //重要
 drawerContainer.addEventListener("input", (e) => {	//drawerContainer 為 div ，而 div 也可以綁定 input 事件
-	e.stopPropagation()	//?
+	e.stopPropagation()	//
 
 	const target = e.target as HTMLElement | null
 
@@ -252,7 +289,7 @@ drawerContainer.addEventListener("input", (e) => {	//drawerContainer 為 div ，
 		//
 		console.log("on input")
 		const targetId = target.getAttribute("data-id")
-		slices = slices.map(el => el.id === targetId ? {...el, text: target.value} : el)
+		slices = slices.map(el => el.id === targetId ? { ...el, text: target.value } : el)
 		setSliceHTML(Number(sliceController.value))
 	}
 })
@@ -275,7 +312,7 @@ startBtn.addEventListener("click", () => {
 
 	timerId = setTimeout(() => {
 		console.log("****")
-		
+
 		x = x - basicRotateDeg
 		x = x % 360
 
@@ -293,7 +330,7 @@ startBtn.addEventListener("click", () => {
 
 		document.querySelector<HTMLDivElement>(".message")!.classList.add("message-active")
 		document.querySelector<HTMLElement>(".message_opts-amount")!.textContent = sliceController.value
-		document.querySelector<HTMLElement>(".message_selected")!.textContent = slice.text	
+		document.querySelector<HTMLElement>(".message_selected")!.textContent = slice.text
 		//notes
 		/** string better than String
 		 * export type Slice = {
@@ -304,7 +341,7 @@ startBtn.addEventListener("click", () => {
 		//if text: String, then
 		/**
 		 * Type 'String' is not assignable to type 'string'.
-         * 'string' is a primitive, but 'String' is a wrapper object. Prefer using 'string' when possible.ts(2322)
+		 * 'string' is a primitive, but 'String' is a wrapper object. Prefer using 'string' when possible.ts(2322)
 		 */
 
 		records.push({
@@ -333,6 +370,6 @@ clearBtn.addEventListener('click', () => {
 
 //
 //
-document.querySelector<HTMLButtonElement>(".message_canceller")!.addEventListener("click", () => {
-	document.querySelector<HTMLDivElement>(".message")!.classList.remove("message-active")
+messageCanceller.addEventListener("click", () => {
+	message.classList.remove("message-active")
 })
